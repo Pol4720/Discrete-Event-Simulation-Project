@@ -1,0 +1,214 @@
+\documentclass[a4paper, 12pt]{article}
+\usepackage[left=2.5cm, right=2.5cm, top=3cm, bottom=3cm]{geometry}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{color}
+\usepackage{xcolor}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\lstdefinelanguage{JavaScript}{
+  keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{background}
+\usepackage[hidelinks]{hyperref}
+\usepackage{float}
+
+\definecolor{colorgreen}{rgb}{0,0.6,0}
+\definecolor{colorgray}{rgb}{0.5,0.5,0.5}
+\definecolor{colorpurple}{rgb}{0.58,0,0.82}
+\definecolor{colorback}{RGB}{255,255,204}
+\definecolor{colorbackground}{RGB}{200,200,221}
+\definecolor{bordercolor}{RGB}{0,0,128}
+
+% Definiendo el estilo de las porciones de código
+\lstset{
+backgroundcolor=\color{colorbackground},
+commentstyle=\color{colorgreen},
+keywordstyle=\color{colorpurple},
+numberstyle=\tiny\color{colorgray},
+stringstyle=\color{colorgreen},
+basicstyle=\ttfamily\footnotesize,
+breakatwhitespace=false,
+breaklines=true,
+captionpos=b,
+keepspaces=true,
+numbers=left,
+showspaces=false,
+showstringspaces=false,
+showtabs=false,
+tabsize=2,
+frame=single,
+framesep=2pt,
+rulecolor=\color{black},
+framerule=1pt
+}
+
+% Configuración de encabezado y pie de página
+\setlength{\headheight}{15.04742pt}
+\addtolength{\topmargin}{-3.04742pt}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\leftmark}
+\fancyhead[R]{\thepage}
+\fancyfoot[C]{\textit{Universidad de La Habana - Facultad de Matemática y Computación}}
+
+% Configuración de títulos
+\titleformat{\section}
+  {\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}{\thesubsection}{1em}{}
+
+% Configuración de fondo de página
+\backgroundsetup{
+  scale=1,
+  color=bordercolor,
+  opacity=0.3,
+  angle=0,
+  position=current page.south,
+  vshift=10cm,
+  hshift=0cm,
+  contents={%
+    \begin{tikzpicture}[remember picture,overlay]
+      \draw[bordercolor,ultra thick] (current page.south west) rectangle (current page.north east);
+    \end{tikzpicture}
+  }
+}
+%sl23
+
+\begin{document}
+\graphicspath{{./}}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\huge\bfseries Informe\\[0.4cm]}
+    {\LARGE Un Problema de Reparación \\}
+    \vspace*{2cm}
+    \includegraphics[width=0.2\textwidth, height=0.2\textheight]{Images/Presentacion.png}\\[0.5cm]
+   
+    {\Large \textbf{Richard Alejandro Matos Arderí}\\[0.5cm]}
+    {\Large Grupo 311, Ciencia de la Computación\\[0.5cm]}
+    {\Large Facultad de Matemática y Computación\\[0.5cm]}
+    {\Large Universidad de La Habana\\[0.5cm]}
+    \vfill
+    \includegraphics[width=0.2\textwidth, height=0.2\textheight]{Images/MATCOM.jpg}\\[0.5cm]
+    {\Large 2025}
+\end{titlepage}
+
+\newpage
+\tableofcontents
+\newpage
+
+
+\section{Introducción}
+
+\section{Definición del problema}
+\subsection{Un problema de reparación}
+
+Una estación de trabajo consta de $n$ máquinas idénticas que trabajan en paralelo y una única instalación de reparación. Las máquinas fallan, cuando están funcionando, de acuerdo con una distribución exponencial común con tasa $\lambda$. Es decir, las vidas útiles de las máquinas en uso son variables aleatorias independientes y cada una tiene una distribución exponencial con tasa $\lambda$. Cuando una máquina falla, pasa a repararse a la instalación de reparación.
+
+La cantidad de tiempo que lleva reparar una máquina es una variable aleatoria con función de distribución $G$. Suponemos que el sistema comienza con todas las máquinas funcionando (es decir, no hay máquinas en la instalación de reparación). Queremos simular este sistema para estimar el tiempo hasta que haya $r$ máquinas simultáneamente inactivas (ya sea en reparación o esperando a ser reparadas).
+
+Variables de estado del sistema: $(n)$, donde $n$ es el número de máquinas actualmente en uso. \\
+
+Lista de eventos: $(t_1, t_2, \dots, t_n, t^*)$, donde 
+
+$t_1, \dots, t_n$ son los tiempos (en orden) en los que las $n$ máquinas en uso fallarán, y 
+
+$t^*$ es el tiempo en el que la máquina actualmente en reparación (si hay alguna en reparación) se pondrá en funcionamiento nuevamente, o si no hay ninguna máquina actualmente en reparación entonces $t^* = \infty$.
+
+Variable de salida: $T$, el primer momento en el que haya $r$ máquinas simultáneamente inactivas.
+
+Para inicializar, establecemos
+
+Inicialización:
+
+
+- Generamos $X_1, \dots, X_n \sim F$
+
+- Establecemos $t_i$ como el $i$-ésimo menor de $X_1, \dots, X_n$
+
+- Establecemos $t = 0, r = 0, t^* = \infty$
+
+
+Para actualizar, avanzamos al siguiente evento, primero comprobando si nos lleva más allá del tiempo $T$.
+
+Paso de actualización:
+Caso 1: $t_E > T$: 
+Establecer $I = 1$ y finalizar esta ejecución.
+
+Caso 2: $t_E \leq T$:
+
+
+- Restablecer $t = t_E$
+
+- Generar $J$:
+
+
+- Si $J = 1$: restablecer $n = n + 1$
+
+- Si $J = 2$: restablecer $n = n - 1$
+
+- Si $J = 3$: Generar $Y$. Si $Y > a$, establecer $I = 0$ y finalizar esta ejecución; de lo contrario, restablecer $a = a - Y$
+
+
+- Generar $X$: restablecer $t_E = t + X$
+
+
+El paso de actualización se repite continuamente hasta que se completa una ejecución.
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

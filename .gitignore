@@ -1,0 +1,6 @@
+# Archivos de compilación de LaTeX
+*.aux
+*.log
+*.synctex.gz
+*.toc
+*.out
