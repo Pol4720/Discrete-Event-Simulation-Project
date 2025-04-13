@@ -113,59 +113,73 @@ framerule=1pt
 \section{Introducción}
 
 \section{Definición del problema}
-\subsection{Un problema de reparación}
+Un sistema necesita $ n $ máquinas en funcionamiento para operar. Para protegerse contra fallos, se mantienen máquinas adicionales como repuestos. Cuando una máquina falla, es reemplazada inmediatamente por un repuesto y enviada a la instalación de reparación. Esta instalación consta de una sola persona que repara las máquinas una a la vez. Una vez reparada, una máquina se convierte en un repuesto disponible (ver Figura 7.4). Los tiempos de reparación son variables aleatorias independientes con una función de distribución común $ G $. El tiempo de funcionamiento antes de fallar, para cada máquina, es una variable aleatoria independiente con función de distribución $ F $.
 
-Una estación de trabajo consta de $n$ máquinas idénticas que trabajan en paralelo y una única instalación de reparación. Las máquinas fallan, cuando están funcionando, de acuerdo con una distribución exponencial común con tasa $\lambda$. Es decir, las vidas útiles de las máquinas en uso son variables aleatorias independientes y cada una tiene una distribución exponencial con tasa $\lambda$. Cuando una máquina falla, pasa a repararse a la instalación de reparación.
+El sistema "colapsa" cuando una máquina falla y no hay repuestos disponibles. Suponiendo que inicialmente hay $ n + s $ máquinas funcionales ($ n $ en uso y $ s $ como repuestos), estamos interesados en simular este sistema para aproximar $ E[T] $, donde $ T $ es el tiempo en que el sistema colapsa.
 
-La cantidad de tiempo que lleva reparar una máquina es una variable aleatoria con función de distribución $G$. Suponemos que el sistema comienza con todas las máquinas funcionando (es decir, no hay máquinas en la instalación de reparación). Queremos simular este sistema para estimar el tiempo hasta que haya $r$ máquinas simultáneamente inactivas (ya sea en reparación o esperando a ser reparadas).
+\subsection*{Variables Utilizadas en la Simulación}
 
-Variables de estado del sistema: $(n)$, donde $n$ es el número de máquinas actualmente en uso. \\
-
-Lista de eventos: $(t_1, t_2, \dots, t_n, t^*)$, donde 
-
-$t_1, \dots, t_n$ son los tiempos (en orden) en los que las $n$ máquinas en uso fallarán, y 
-
-$t^*$ es el tiempo en el que la máquina actualmente en reparación (si hay alguna en reparación) se pondrá en funcionamiento nuevamente, o si no hay ninguna máquina actualmente en reparación entonces $t^* = \infty$.
-
-Variable de salida: $T$, el primer momento en el que haya $r$ máquinas simultáneamente inactivas.
-
-Para inicializar, establecemos
-
-Inicialización:
+    
+- \textbf{Variable de tiempo:} $ t $
+    
+- \textbf{Variable de estado del sistema:} $ r $, el número de máquinas fuera de servicio en el tiempo $ t $.
 
 
-- Generamos $X_1, \dots, X_n \sim F$
+Se dice que ocurre un ``evento`` cuando:
+\begin{enumerate}
+    \item Una máquina en funcionamiento falla.
+    \item Se completa una reparación.
+\end{enumerate}
 
-- Establecemos $t_i$ como el $i$-ésimo menor de $X_1, \dots, X_n$
+Para determinar cuándo ocurrirá el próximo evento, necesitamos realizar un seguimiento de los tiempos de fallo de las máquinas en uso y el tiempo de finalización de la reparación actual. Es conveniente almacenar estos tiempos en una lista ordenada:
 
-- Establecemos $t = 0, r = 0, t^* = \infty$
+\[
+\text{Lista de eventos: } t_1 \leq t_2 \leq t_3 \leq \cdots \leq t_n, t^*
+\]
+donde $ t_1, \dots, t_n $ son los tiempos (en orden) en que las $ n $ máquinas en uso fallarán, y $ t^* $ es el tiempo en que la máquina en reparación volverá a estar operativa, o $ t^* = \infty $ si no hay ninguna máquina en reparación.
 
+\subsection*{Inicialización de la Simulación}
+\begin{enumerate}
+    \item Establecer $ t = r = 0 $, $ t^* = \infty $.
+    \item Generar $ X_1, \dots, X_n $, variables aleatorias independientes con distribución $ F $.
+    \item Ordenar estos valores y asignar $ t_i $ como el $ i $-ésimo valor más pequeño, $ i = 1, \dots, n $.
+    \item Establecer la lista de eventos: $ t_1, \dots, t_n, t^* $.
+\end{enumerate}
 
-Para actualizar, avanzamos al siguiente evento, primero comprobando si nos lleva más allá del tiempo $T$.
+\subsection*{Actualización del Sistema}
+La actualización depende de los siguientes casos:
 
-Paso de actualización:
-Caso 1: $t_E > T$: 
-Establecer $I = 1$ y finalizar esta ejecución.
+\subsubsection*{Caso 1: $ t_1 < t^* $}
+\begin{enumerate}
+    \item Restablecer $ t = t_1 $.
+    \item Restablecer $ r = r + 1 $ (otra máquina ha fallado).
+    \item Si $ r = s + 1 $, detener la simulación y registrar $ T = t $ (el sistema colapsa).
+    \item Si $ r < s + 1 $:
+    
+        
+- Generar una variable aleatoria $ X $ con distribución $ F $ (tiempo de funcionamiento del repuesto).
+        
+- Reordenar los valores $ t_2, t_3, \dots, t_n, t + X $ y actualizar $ t_i $ como el $ i $-ésimo valor más pequeño.
+        
+- Si $ r = 1 $, generar una variable aleatoria $ Y $ con distribución $ G $ y restablecer $ t^* = t + Y $.
+    
+\end{enumerate}
 
-Caso 2: $t_E \leq T$:
+\subsubsection*{Caso 2: $ t^* \leq t_1 $}
+\begin{enumerate}
+    \item Restablecer $ t = t^* $.
+    \item Restablecer $ r = r - 1 $.
+    \item Si $ r > 0 $, generar una variable aleatoria $ Y $ con distribución $ G $ y restablecer $ t^* = t + Y $.
+    \item Si $ r = 0 $, establecer $ t^* = \infty $.
+\end{enumerate}
 
+\subsection*{Resultados de la Simulación}
+Cada vez que el sistema colapsa ($ r = s + 1 $), decimos que se completa una ejecución. La salida de la ejecución es el tiempo de colapso $ T $. Realizamos $ k $ ejecuciones, con salidas sucesivas $ T_1, \dots, T_k $. Estas variables son independientes y representan tiempos de colapso. Su promedio,
+\[
+\frac{1}{k} \sum_{i=1}^k T_i,
+\]
+es una estimación de $ E[T] $, el tiempo medio de colapso. El método para determinar el valor de $ k $ se discute en el Capítulo 8, que presenta técnicas para analizar estadísticamente los resultados de las simulaciones.
 
-- Restablecer $t = t_E$
-
-- Generar $J$:
-
-
-- Si $J = 1$: restablecer $n = n + 1$
-
-- Si $J = 2$: restablecer $n = n - 1$
-
-- Si $J = 3$: Generar $Y$. Si $Y > a$, establecer $I = 0$ y finalizar esta ejecución; de lo contrario, restablecer $a = a - Y$
-
-
-- Generar $X$: restablecer $t_E = t + X$
-
-
-El paso de actualización se repite continuamente hasta que se completa una ejecución.
 
 \end{document}
 
