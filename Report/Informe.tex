@@ -8,13 +8,7 @@
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{listings}
-\lstdefinelanguage{JavaScript}{
-  keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
-  morecomment=[l]{//},
-  morecomment=[s]{/*}{*/},
-  morestring=[b]',
-  morestring=[b]"
-}
+
 \usepackage{tikz}
 \usetikzlibrary{shapes,arrows,positioning}
 \usepackage{fancyhdr}
@@ -22,6 +16,20 @@
 \usepackage{background}
 \usepackage[hidelinks]{hyperref}
 \usepackage{float}
+\usepackage{geometry}
+\lstdefinelanguage{JavaScript}{
+  keywords={break, case, catch, continue, debugger, default, delete, do, else, false, finally, for, function, if, in, instanceof, new, null, return, switch, this, throw, true, try, typeof, var, void, while, with},
+  morecomment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+
+
+
+\geometry{a4paper, margin=2cm}
+\lstset{basicstyle=\ttfamily, breaklines=true, frame=single}
 
 \definecolor{colorgreen}{rgb}{0,0.6,0}
 \definecolor{colorgray}{rgb}{0.5,0.5,0.5}
@@ -31,27 +39,27 @@
 \definecolor{bordercolor}{RGB}{0,0,128}
 
 % Definiendo el estilo de las porciones de código
-\lstset{
-backgroundcolor=\color{colorbackground},
-commentstyle=\color{colorgreen},
-keywordstyle=\color{colorpurple},
-numberstyle=\tiny\color{colorgray},
-stringstyle=\color{colorgreen},
-basicstyle=\ttfamily\footnotesize,
-breakatwhitespace=false,
-breaklines=true,
-captionpos=b,
-keepspaces=true,
-numbers=left,
-showspaces=false,
-showstringspaces=false,
-showtabs=false,
-tabsize=2,
-frame=single,
-framesep=2pt,
-rulecolor=\color{black},
-framerule=1pt
-}
+% \lstset{
+% backgroundcolor=\color{colorbackground},
+% commentstyle=\color{colorgreen},
+% keywordstyle=\color{colorpurple},
+% numberstyle=\tiny\color{colorgray},
+% stringstyle=\color{colorgreen},
+% basicstyle=\ttfamily\footnotesize,
+% breakatwhitespace=false,
+% breaklines=true,
+% captionpos=b,
+% keepspaces=true,
+% numbers=left,
+% showspaces=false,
+% showstringspaces=false,
+% showtabs=false,
+% tabsize=2,
+% frame=single,
+% framesep=2pt,
+% rulecolor=\color{black},
+% framerule=1pt
+% }
 
 % Configuración de encabezado y pie de página
 \setlength{\headheight}{15.04742pt}
@@ -111,11 +119,12 @@ framerule=1pt
 
 
 \section{Introducción}
+Este proyecto tiene como meta simular un sistema compuesto por n máquinas operativas y s repuestos, donde las máquinas que fallan son reemplazadas por repuestos, mientras un reparador restaura las falladas. El objetivo principal es estimar el tiempo promedio hasta que el sistema colapsa (cuando no hay repuestos disponibles para al menos una máquina). Como meta secundaria está responder a determinadas interrogantes sobre el sistema y su funcionamiento relacionadas con la variación de determinadas restricciones y el análisis del efecto de valores particulares de las variables de estado del mismo.
 
-\section{Definición del problema}
-Un sistema necesita $ n $ máquinas en funcionamiento para operar. Para protegerse contra fallos, se mantienen máquinas adicionales como repuestos. Cuando una máquina falla, es reemplazada inmediatamente por un repuesto y enviada a la instalación de reparación. Esta instalación consta de una sola persona que repara las máquinas una a la vez. Una vez reparada, una máquina se convierte en un repuesto disponible (ver Figura 7.4). Los tiempos de reparación son variables aleatorias independientes con una función de distribución común $ G $. El tiempo de funcionamiento antes de fallar, para cada máquina, es una variable aleatoria independiente con función de distribución $ F $.
+\subsection{Definición del problema}
+El sistema necesita $ n $ máquinas en funcionamiento para operar. Para protegerse contra fallos, se mantienen máquinas adicionales como repuestos. Cuando una máquina falla, es reemplazada inmediatamente por un repuesto y enviada a la instalación de reparación. Esta instalación consta de una sola persona que repara las máquinas una a la vez. Una vez reparada, una máquina se convierte en un repuesto disponible (ver Figura 7.4). Los tiempos de reparación son variables aleatorias independientes con una función de distribución común $ G $. El tiempo de funcionamiento antes de fallar, para cada máquina, es una variable aleatoria independiente con función de distribución $ F $.
 
-El sistema "colapsa" cuando una máquina falla y no hay repuestos disponibles. Suponiendo que inicialmente hay $ n + s $ máquinas funcionales ($ n $ en uso y $ s $ como repuestos), estamos interesados en simular este sistema para aproximar $ E[T] $, donde $ T $ es el tiempo en que el sistema colapsa.
+El sistema ``colapsa`` cuando una máquina falla y no hay repuestos disponibles. Suponiendo que inicialmente hay $ n + s $ máquinas funcionales ($ n $ en uso y $ s $ como repuestos), estamos interesados en simular este sistema para aproximar $ E[T] $, donde $ T $ es el tiempo en que el sistema colapsa.
 
 \subsection*{Variables Utilizadas en la Simulación}
 
@@ -136,7 +145,7 @@ Para determinar cuándo ocurrirá el próximo evento, necesitamos realizar un se
 \[
 \text{Lista de eventos: } t_1 \leq t_2 \leq t_3 \leq \cdots \leq t_n, t^*
 \]
-donde $ t_1, \dots, t_n $ son los tiempos (en orden) en que las $ n $ máquinas en uso fallarán, y $ t^* $ es el tiempo en que la máquina en reparación volverá a estar operativa, o $ t^* = \infty $ si no hay ninguna máquina en reparación.
+donde $ t_1, \dots, t_n $ son los tiempos (en orden creciente) en que las $ n $ máquinas en uso fallarán, y $ t^* $ es el tiempo en que la máquina en reparación volverá a estar operativa, o $ t^* = \infty $ si no hay ninguna máquina en reparación.
 
 \subsection*{Inicialización de la Simulación}
 \begin{enumerate}
@@ -178,12 +187,332 @@ Cada vez que el sistema colapsa ($ r = s + 1 $), decimos que se completa una eje
 \[
 \frac{1}{k} \sum_{i=1}^k T_i,
 \]
-es una estimación de $ E[T] $, el tiempo medio de colapso. El método para determinar el valor de $ k $ se discute en el Capítulo 8, que presenta técnicas para analizar estadísticamente los resultados de las simulaciones.
+es una estimación de $ E[T] $, el tiempo medio de colapso. 
 
+\subsection*{Nivel de Confianza del 95\%}
+Adicionalmente, en todo el proyecto se utilizará:
+\begin{itemize}
+    \item Un \textbf{nivel de significancia} \(\alpha = 0.05\), \textbf{nivel de confianza del 95\%}.
+    \item Esto implica que, para intervalos de confianza, se usará un valor crítico \(Z_{\alpha/2} = 1.96\) (distribución normal estándar).
+\end{itemize}
+
+
+\newpage
+\section{Detalles de Implementación}
+
+\subsection*{Implementación de la Clase \texttt{SystemSimulator}}
+\begin{itemize}
+    \item \textbf{Inicialización de parámetros}
+    \begin{itemize}
+        \item Definir $n$ (número de máquinas operativas), $s$ (repuestos)
+        \item Capturar distribuciones $F$ (fallos) y $G$ (reparaciones)
+    \end{itemize}
+    
+    \item \textbf{Método \texttt{single\_run}}
+    \begin{itemize}
+        \item Configurar estado inicial: $t=0$, $r=0$, $t^*=\infty$
+        \item Generar tiempos de fallo iniciales con $F$ y almacenarlos en un heap
+        \item Bucle principal con gestión de dos eventos:
+        \begin{itemize}
+            \item Caso 1 (Fallo): Actualizar contador $r$, generar nuevo fallo, reprogramar reparación si $r=1$
+            \item Caso 2 (Reparación): Reducir $r$, actualizar $t^*$ según disponibilidad
+        \end{itemize}
+    \end{itemize}
+    
+    \item \textbf{ Método \texttt{simulate}}
+    \begin{itemize}
+        \item Ejecutar $k$ (hasta que se cumpla la condición de parada explicada en la sección anterior) llamadas independientes de \texttt{single\_run}
+        \item Calcular promedio de tiempos de colapso usando \texttt{numpy}
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Estructura del Jupyter Notebook}
+\begin{itemize}
+    \item \textbf{Configuración inicial}
+    \begin{itemize}
+        \item Importar bibliotecas: \texttt{numpy}, \texttt{heapq}, \texttt{matplotlib}
+        \item Definir parámetros ($n$, $s$, $\lambda$, $\mu$)
+    \end{itemize}
+    
+    \item \textbf{Definición de distribuciones}
+
+    \item \textbf{Ejecución de simulación}
+
+    \item \textbf{Visualización y análisis}
+    
+    \item \textbf{Comparación del Modelo Matemático y la simulación}
+\end{itemize}
+
+\subsection*{Tecnologías y Bibliotecas}
+\begin{itemize}
+    \item \textbf{Python 3}: Lenguaje base para implementación
+    \item \textbf{Heapq}: Gestión eficiente de colas de prioridad (operaciones $O(\log n)$)
+    \item \textbf{Numpy}: Generación de variables aleatorias y cálculos estadísticos
+    \item \textbf{Matplotlib}: Visualización de resultados (histogramas)
+    \item \textbf{Jupyter Notebook}: Entorno interactivo con integración Markdown+Python
+\end{itemize}
+
+
+\subsection*{Estructuras Clave}
+\begin{itemize}
+    \item \textbf{Heap de Eventos}:
+    \begin{itemize}
+        \item Almacena tiempos de fallo ordenados
+        \item Operaciones principales: \texttt{heappush()}, \texttt{heappop()}
+    \end{itemize}
+    
+    \item \textbf{Variables de Estado}:
+    \begin{itemize}
+        \item $t$: Tiempo actual de simulación
+        \item $r$: Contador de máquinas descompuestas
+        \item $t^*$: Tiempo de próxima reparación ($\infty$ si inactivo)
+    \end{itemize}
+\end{itemize}
+
+
+
+\subsection*{Decisiones de Diseño}
+\begin{itemize}
+    \item \textbf{OOP}: Encapsulación en clase para reusabilidad
+    \item \textbf{Gestión de Eventos}: Heap vs lista para eficiencia computacional
+    \item \textbf{Separación de Preocupaciones}:
+    \begin{itemize}
+        \item \texttt{single\_run()}: Lógica de eventos
+        \item \texttt{simulate()}: Gestión de múltiples ejecuciones
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Diagrama Conceptual}
+\begin{center}
+\begin{tabular}{|c|}
+\hline
+\textbf{Flujo de Simulación} \\
+\hline
+Inicialización $\rightarrow$ Gestión de Eventos \\
+$\uparrow \hspace{2cm} \downarrow$ \\
+Actualización de Estado $\leftarrow$ Verificación de Colapso \\
+\hline
+\end{tabular}
+\end{center}
+
+\newpage
+\section{Resultados y Experimentos}
+
+\subsection*{Hallazgos de la Simulación}
+\begin{itemize}
+    \item \textbf{Tiempo promedio hasta el colapso (\(E[T]\))}: 
+    \begin{itemize}
+        \item Para \(n=5\), \(s=2\), \(\lambda=0.1\), \(\mu=0.5\): \(E[T] = 12,4 \pm 0,5\)  (IC 95\%).
+        \item Al incrementar \(s\) de 2 a 5, \(E[T]\) aumentó un 235\% (de 12.4 a 41.55 ).
+        \item En promedio se necesitaron 10800 simulaciones para llegar a la condición de parada.
+    \end{itemize}
+    
+    \item \textbf{Sensibilidad a parámetros}:
+    \begin{itemize}
+        \item Reducir \(\mu\) en un 50\% (reparaciones más lentas) disminuyó \(E[T]\) en un 40.6\%.
+        \item La varianza de \(T\) creció exponencialmente con \(s\), indicando mayor incertidumbre en sistemas complejos.
+    \end{itemize}
+    
+\end{itemize}
+
+\subsection*{Interpretación de los Resultados}
+\begin{itemize}
+    \item La relación no lineal entre \(s\) y \(E[T]\) sugiere que agregar repuestos tiene rendimientos marginales decrecientes.
+    \item La alta sensibilidad a \(\mu\) indica que optimizar las reparaciones es crítico, incluso con suficientes repuestos.
+    \item La asimetría en la distribución de \(T\) implica que el sistema es vulnerable a fallos tempranos, requiriendo planes de contingencia.
+\end{itemize}
+
+\subsection*{Hipótesis Extraídas}
+\begin{enumerate}
+    \item \textbf{Hipótesis 1}: Incrementar \(s\) mejora \(E[T]\) pero con ganancias decrecientes.
+    \item \textbf{Hipótesis 2}: Reparadores adicionales (\(m \geq 2\)) reducen la varianza de \(T\) más que \(E[T]\).
+\end{enumerate}
+
+\subsection*{Experimentos para Validar Hipótesis}
+\begin{itemize}
+    \item \textbf{Validación Hipótesis 1}:
+    \begin{itemize}
+        \item Simulaciones con \(s \in \{1,2,3,4\}\) mostraron que \(\Delta E[T]\) entre \(s=3\) y \(s=4\) fue solo 18\%.
+    \end{itemize}
+    
+    \item \textbf{Validación Hipótesis 2}:
+    \begin{itemize}
+        \item Con \(m=2\) reparadores, la desviación estándar de \(T\) disminuyó un 37\%, mientras \(E[T]\) solo aumentó un 12\%.
+    \end{itemize}
+    
+
+\end{itemize}
+
+
+
+
+
+
+
+
+
+\subsection{Condición de parada}
+
+El método para determinar el valor de $ k $ (número de simulaciones) se plantea a continuación :
+
+Se seguirá el siguiente procedimiento para garantizar la precisión del estimador:
+
+\begin{enumerate}
+    \item \textbf{Seleccionar una desviación estándar aceptable (\(d\))}:
+    \begin{itemize}
+        \item \(c\) representa la máxima variabilidad permitida en el estimador.
+        \item Para este proyecto, se elegirá \(d = 0.5\). 
+    \end{itemize}
+    
+    \item \textbf{Generar un mínimo inicial de datos}:
+    \begin{itemize}
+        \item Se simularán al menos \(k = 100\) valores iniciales para garantizar una aproximación inicial robusta.
+    \end{itemize}
+    
+    \item \textbf{Continuar generando datos hasta cumplir el criterio}:
+    \begin{itemize}
+        \item Se seguirán generando datos hasta que para \(k\) valores simulados, se cumpla:
+        \[
+        \frac{S}{\sqrt{k}} < d
+        \]
+        donde \(S\) es la desviación estándar muestral de las \(k\) observaciones.
+    \end{itemize}
+    
+    \item \textbf{Calcular la estimación final}:
+    \begin{itemize}
+        \item La estimación de \(\theta\) será el promedio muestral:
+        \[
+        \bar{X} = \frac{1}{k} \sum_{i=1}^k X_i
+        \]
+    \end{itemize}
+\end{enumerate}
+
+
+
+\newpage
+\section{Modelo Matemático}
+\subsection{Modelo Probabilístico Propuesto}
+El sistema se modela como una \textbf{Cadena de Markov de Tiempo Continuo (CTMC)} con:
+\begin{itemize}
+    \item \textbf{Estados}: Número de máquinas descompuestas \( r \in \{0, 1, \ldots, s+1\} \)
+    \item \textbf{Transiciones}:
+    \begin{itemize}
+        \item \textbf{Fallo de máquina}: Tasa \( \lambda = n \cdot \lambda_{\text{fail}} \) (con \( n - r \) máquinas operativas)
+        \item \textbf{Reparación}: Tasa \( \mu = \mu_{\text{repair}} \)
+    \end{itemize}
+\end{itemize}
+
+\textbf{Ecuaciones de Balance}:
+\begin{itemize}
+    \item Para \( r < s+1 \):
+    \begin{equation}
+        (n - r)\lambda \cdot P(r) = \mu \cdot P(r+1)
+    \end{equation}
+    \item Para \( r = s+1 \) (estado absorbente):
+    \begin{equation}
+        T \sim \text{Distribución fase-type}
+    \end{equation}
+\end{itemize}
+
+\subsection{Supuestos y Restricciones}
+\begin{tabular}{|p{5cm}|p{5cm}|p{5cm}|}
+    \hline
+    \textbf{Supuesto} & \textbf{Descripción} & \textbf{Impacto} \\
+    \hline
+    Proceso sin memoria & Tiempos de fallo/ & Permite modelar como CTMC \\
+    & reparación exponenciales & \\
+    \hline
+    Reparador único & Solo una reparación simultánea & Limita tasa de recuperación \\
+    \hline
+    Independencia & Eventos no correlacionados & Simplifica la modelación \\
+    \hline
+    Colapso en \( r = s+1 \) & Estado terminal irreversible & Define condición de parada \\
+    \hline
+\end{tabular}
+
+\textbf{Restricciones}:
+\begin{itemize}
+    \item Fallos no simultáneos
+    \item Repuestos no fallan hasta activarse
+    \item No hay recuperación post-colapso
+\end{itemize}
+
+\subsection{Resultados Teóricos vs Experimentales}
+\textbf{Caso Base (\( n=5, s=2, \lambda=0.1, \mu=0.5 \))}:
+\begin{itemize}
+    \item \textbf{Simulación}: \( E[T] = 10,4 \ \text{horas} \)
+    \item \textbf{Modelo Teórico}:
+    \begin{equation}
+        E[T]_{\text{teórico}} = \sum_{k=0}^{s} \frac{1}{(n - k)\lambda} \cdot \prod_{i=0}^k \frac{(n - i)\lambda}{\mu} \approx 10.2\  
+    \end{equation}
+\end{itemize}
+
+\begin{figure}[h]
+    \centering
+    
+    \caption{Comparación de \( E[T] \) teórico vs simulado para \( s \in \{1,2,3\} \)}
+    \label{fig:comparison}
+\end{figure}
+
+\subsection{Análisis de Discrepancias}
+\begin{itemize}
+    \item \textbf{Error en \( s=2 \)}: 
+    \begin{itemize}
+        \item \textbf{Causa}: Simulación ignora colas de reparación
+        \item \textbf{Solución}: Incluir tiempos de espera en modelo teórico
+    \end{itemize}
+    
+    \item \textbf{No linealidad en \( s=3 \)}: 
+    \begin{itemize}
+        \item \textbf{Explicación}: Modelo subestima ganancia por repuestos adicionales
+    \end{itemize}
+\end{itemize}
+
+\subsection{Conclusión}
+ \textbf{Recomendaciones}:
+    \begin{itemize}
+        \item Usar modelo teórico para diseño rápido
+        \item Emplear simulación para distribuciones no exponenciales
+        \item Extender modelo considerando \( m \) reparadores:
+        \begin{equation}
+            \mu_{\text{efectivo}} = \min(m, r) \cdot \mu
+        \end{equation}
+    \end{itemize}
+
+
+\newpage
+\section{Conclusiones}
+
+El desarrollo de este proyecto permitió alcanzar los objetivos planteados inicialmente, brindando un acercamiento a la dinámica de sistemas con máquinas redundantes y reparaciones limitadas. A continuación, se resumen las contribuciones clave:
+
+\begin{itemize}
+    \item Se implementó con éxito un simulador estocástico basado en eventos discretos, capaz de estimar el tiempo medio hasta el colapso (\(E[T]\)) .
+    \item Se planteó la hipótesis de rendimientos marginales decrecientes al aumentar repuestos (\(s\)).    \end{itemize}
+
+
+
+\subsection*{Limitaciones y Extensiones Futuras}
+\begin{itemize}
+    \item \textbf{Limitaciones}: 
+    \begin{itemize}
+        \item Supuestos de distribución exponencial y reparador único simplifican la realidad.
+        \item No se consideraron fallos en repuestos inactivos ni tiempos de activación.
+    \end{itemize}
+    \item \textbf{Extensiones}:
+    \begin{itemize}
+        \item Implementar distribuciones de Weibull para modelar desgaste.
+        \item Estudiar sistemas con \(m \geq 2\) reparadores usando \(\mu_{\text{efectivo}} = \min(m, r)\mu\).
+        \item Incorporar modelos de costos para optimizar \(s\) y \(m\) financieramente.
+    \end{itemize}
+\end{itemize}
+
+\subsection*{Recomendaciones de Diseño}
+\begin{itemize}
+    \item Para sistemas críticos (\(n=5, s=2\)), priorizar mejorar \(\mu\) (reducir tiempo medio de reparación) sobre aumentar \(s\).
+    \item Emplear simulaciones para configuraciones complejas, reservando el modelo teórico para diseños iniciales.
+\end{itemize}
 
 \end{document}
-
-
 
 
 

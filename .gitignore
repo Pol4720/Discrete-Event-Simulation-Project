@@ -6,3 +6,4 @@
 *.out
 
 /Reportbuild/
+/Tools/__pycache__/
